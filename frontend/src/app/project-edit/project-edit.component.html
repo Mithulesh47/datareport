@@ -1,0 +1,92 @@
+<div class="container">
+    <h2>Edit Project</h2>
+    <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+        <div class="form-group">
+            <mat-form-field appearance="fill">
+                <mat-label>Project Name</mat-label>
+                <input matInput formControlName="projectName" />
+                <mat-error *ngIf="projectForm.controls['projectName'].hasError('required')">
+                    Project name is required
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field appearance="fill">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description"></textarea>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field appearance="fill">
+                <mat-label>Developer</mat-label>
+                <textarea matInput formControlName="developer"></textarea>
+                <mat-error *ngIf="projectForm.controls['developer'].hasError('required')">
+                    Developer name is required
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field appearance="fill">
+                <mat-label>Jira</mat-label>
+                <input matInput formControlName="jira" />
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field appearance="fill">
+                <mat-label>Start Date</mat-label>
+                <input matInput [matDatepicker]="startDate" formControlName="startDate" />
+                <mat-datepicker-toggle matSuffix [for]="startDate"></mat-datepicker-toggle>
+                <mat-datepicker #startDate></mat-datepicker>
+                <mat-error *ngIf="projectForm.controls['startDate'].hasError('required')">
+                    Start date is required
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field appearance="fill">
+                <mat-label>End Date</mat-label>
+                <input matInput [matDatepicker]="endDate" formControlName="endDate" />
+                <mat-datepicker-toggle matSuffix [for]="endDate"></mat-datepicker-toggle>
+                <mat-datepicker #endDate></mat-datepicker>
+                <mat-error *ngIf="projectForm.controls['endDate'].hasError('required')">
+                    End date is required
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field appearance="fill">
+                <mat-label>Area</mat-label>
+                <mat-select formControlName="areaId">
+                    <mat-option *ngFor="let area of areaList" [value]="area.id">{{ area.name }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="projectForm.controls['areaId'].hasError('required')">
+                    Area is required
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <mat-form-field appearance="fill">
+                <mat-label>Status</mat-label>
+                <mat-select formControlName="statusId">
+                    <mat-option *ngFor="let status of statusList" [value]="status.id">{{ status.statusName
+                        }}</mat-option>
+                </mat-select>
+                <mat-error *ngIf="projectForm.controls['statusId'].hasError('required')">
+                    Status is required
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <div class="form-group">
+            <button mat-raised-button color="primary" type="submit" [disabled]="projectForm.invalid">Update
+                Project</button>
+        </div>
+    </form>
+</div>

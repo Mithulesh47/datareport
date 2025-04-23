@@ -1,0 +1,55 @@
+<form [formGroup]="projectForm" class="p-6 max-w-xl mx-auto space-y-6"  (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Area Name</mat-label>
+        <mat-select formControlName="areaId">
+            <mat-option *ngFor="let area of areaList" [value]="area.id">{{ area.name }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Project Name</mat-label>
+        <input matInput formControlName="projectName" />
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Description</mat-label>
+        <textarea matInput formControlName="description"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Developer / POC</mat-label>
+        <textarea matInput formControlName="developer" ></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>JIRA</mat-label>
+        <input matInput formControlName="jira"/>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Start Date</mat-label>
+        <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="w-full">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="statusId">
+            <mat-option *ngFor="let status of statusList" [value]="status.id">{{ status.statusName }}</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <div class="text-right">
+        <button mat-raised-button color="primary" type="submit" [disabled]="!projectForm.valid">
+            Submit
+        </button>
+    </div>
+</form>
