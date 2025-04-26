@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';  // Add this import
 import { ReactiveFormsModule } from '@angular/forms';  // Add this import
 import { Project } from '../models/project.model';  
+import { MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-project-edit',
@@ -24,8 +25,9 @@ import { Project } from '../models/project.model';
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
-    CommonModule,  // Add this line
-    ReactiveFormsModule  // Add this line
+    CommonModule,  
+    ReactiveFormsModule,
+    MatCardModule
   ],
   templateUrl: './project-edit.component.html',
   styleUrls: ['./project-edit.component.css']
