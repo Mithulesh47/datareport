@@ -8,6 +8,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
 import { ProjectService } from '../services/project.service';
+import { MatCard, MatCardActions, MatCardModule } from '@angular/material/card';
 
 @Component({
   selector: 'app-project-add',
@@ -20,7 +21,8 @@ import { ProjectService } from '../services/project.service';
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatButtonModule
+    MatButtonModule,
+    MatCardModule
   ],
   templateUrl: './project-add.component.html',
   styleUrls: ['./project-add.component.css']

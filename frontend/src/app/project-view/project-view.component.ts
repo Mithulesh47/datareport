@@ -1,12 +1,13 @@
-import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
+import { Router, RouterModule } from '@angular/router';
 import { ProjectService } from '../services/project.service';
 import { AreaService, Area } from '../services/area.service';
 import { MatDialog } from '@angular/material/dialog';
 import { GenericDialogComponent } from '../generic-dialog/generic-dialog.component';
 
 import { CommonModule } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -18,10 +19,12 @@ import { MatTabsModule } from '@angular/material/tabs';
   imports: [
     CommonModule,
     MatTableModule,
+    MatPaginatorModule,
     MatProgressSpinnerModule,
     MatButtonModule,
     MatIconModule,
-    MatTabsModule
+    MatTabsModule,
+    RouterModule
   ],
   templateUrl: './project-view.component.html',
   styleUrls: ['./project-view.component.css']
@@ -39,10 +42,12 @@ export class ProjectViewComponent implements OnInit {
   ];
 
   dataSource: any[] = [];
-  groupedProjects: { [areaName: string]: any[] } = {};
+  groupedProjects: { [areaName: string]: MatTableDataSource<any> } = {};
   areaNames: string[] = [];
   error: boolean = false;
   loading: boolean = true;
+
+  @ViewChildren(MatPaginator) paginators!: QueryList<MatPaginator>;
 
   constructor(
     private projectService: ProjectService,
@@ -55,6 +60,11 @@ export class ProjectViewComponent implements OnInit {
     this.loadProjects();
     this.loadAreas();
   }
+  hasProjects(areaName: string): boolean {
+  const dataSource = this.groupedProjects[areaName];
+  return !!(dataSource && dataSource.data && dataSource.data.length > 0);
+}
+
 
   loadProjects(): void {
     this.loading = true;
@@ -89,10 +99,21 @@ export class ProjectViewComponent implements OnInit {
   groupProjectsByArea(): void {
     this.groupedProjects = {};
     for (const areaName of this.areaNames) {
-      this.groupedProjects[areaName] = this.dataSource.filter(
+      const projects = this.dataSource.filter(
         project => project.area?.name === areaName
       );
+      this.groupedProjects[areaName] = new MatTableDataSource<any>(projects);
     }
+    setTimeout(() => {
+      if (this.paginators) {
+        this.areaNames.forEach((area, index) => {
+          const paginator = this.paginators.get(index);
+          if (paginator) {
+            this.groupedProjects[area].paginator = paginator;
+          }
+        });
+      }
+    }, 0);
   }
 
   editProject(project: any): void {
