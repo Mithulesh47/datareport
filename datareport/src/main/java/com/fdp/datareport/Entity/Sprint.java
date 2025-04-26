@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.Date;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
 
 @Entity
 @Data
@@ -34,10 +37,12 @@ public class Sprint {
     // Many sprints can be for one status
     @ManyToOne
     @JoinColumn(name = "status_id")
+    @OnDelete(action = OnDeleteAction.SET_NULL) // Set Status to null when the Status is deleted
     private Status sprintFor;
 
     // Many sprints can be linked to one project
     @ManyToOne
     @JoinColumn(name = "project_id")
+    @OnDelete(action = OnDeleteAction.CASCADE) // Automatically delete projects when the Area is deleted
     private Project project;
 }

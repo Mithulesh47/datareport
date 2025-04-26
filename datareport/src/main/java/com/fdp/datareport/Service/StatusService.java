@@ -37,13 +37,12 @@ public class StatusService {
 
     // Update an existing status
     public Status updateStatus(Long id, Status updatedStatus) {
-        return statusRepository.findById(id)
-                .map(existingStatus -> {
-                    existingStatus.setStatusName(updatedStatus.getStatusName());
-                    existingStatus.setPercentage(updatedStatus.getPercentage());
-                    return statusRepository.save(existingStatus);
-                })
-                .orElseThrow(() -> new RuntimeException("Status not found with id " + id));
+        if (statusRepository.existsById(id)) {
+            updatedStatus.setId(id);
+            return statusRepository.save(updatedStatus);
+        } else {
+            throw new RuntimeException("Status not found with id " + id);
+        }
     }
 
     // Delete a status
@@ -51,12 +50,16 @@ public class StatusService {
     public boolean deleteStatus(Long id) {
         Optional<Status> statusOpt = statusRepository.findById(id);
         if (statusOpt.isPresent()) {
-            // Update Projects to set status to null
-            List<Project> projects = projectRepository.findByStatus(statusOpt.get());
+            Status status = statusOpt.get();
+
+            // Set status to null for all projects using this status
+            List<Project> projects = projectRepository.findByStatus(status);
             for (Project project : projects) {
                 project.setStatus(null);
                 projectRepository.save(project);
             }
+
+            // Now delete the status
             statusRepository.deleteById(id);
             return true;
         }

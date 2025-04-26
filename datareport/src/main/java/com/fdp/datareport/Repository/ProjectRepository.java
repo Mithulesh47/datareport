@@ -13,4 +13,6 @@ import java.util.List;
 public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> findByArea(Area area);
     List<Project> findByStatus(Status status);
+    void deleteByArea(Area area);
+
 }

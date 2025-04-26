@@ -1,7 +1,6 @@
 package com.fdp.datareport.Service;
 
 import com.fdp.datareport.Entity.Area;
-import com.fdp.datareport.Entity.Project;
 import com.fdp.datareport.Repository.AreaRepository;
 import com.fdp.datareport.Repository.ProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,17 +44,15 @@ public class AreaService {
         }
     }
 
-    // Delete an area
+    // Delete an area and its associated projects
     @Transactional
     public boolean deleteArea(Long id) {
         Optional<Area> areaOpt = areaRepo.findById(id);
         if (areaOpt.isPresent()) {
-            // Update Projects to set area to null
-            List<Project> projects = projectRepository.findByArea(areaOpt.get());
-            for (Project project : projects) {
-                project.setArea(null);
-                projectRepository.save(project);
-            }
+            // Delete all projects that belong to this area
+            projectRepository.deleteByArea(areaOpt.get());
+
+            // Then delete the area itself
             areaRepo.deleteById(id);
             return true;
         }

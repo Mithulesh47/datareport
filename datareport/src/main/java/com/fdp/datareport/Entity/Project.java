@@ -20,16 +20,17 @@ public class Project {
     private String developer;
     private String jira;
 
+    // Cascade delete for Area, meaning when an Area is deleted, all Projects related to that Area will be deleted
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "area_id")
-    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @OnDelete(action = OnDeleteAction.CASCADE) // Automatically delete projects when the Area is deleted
     private Area area;
 
+    // Set Status to null when Status is deleted
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "status_id")
-    @OnDelete(action = OnDeleteAction.SET_NULL)
+    @OnDelete(action = OnDeleteAction.SET_NULL) // Set Status to null when the Status is deleted
     private Status status;
-
 
     private Date startDate;
     private Date endDate;
@@ -110,11 +111,7 @@ public class Project {
     // This method is invoked before a Project is deleted
     @PreRemove
     private void onDelete() {
-        if (this.area != null) {
-            this.area = null; // set the area to null before deleting the Project
-        }
-        if (this.status != null) {
-            this.status = null; // set the status to null before deleting the Project
-        }
+        // The cascading behavior for Area and Status is already handled by annotations
+        // No need to do manual nullification here for cascading delete or nullification
     }
 }

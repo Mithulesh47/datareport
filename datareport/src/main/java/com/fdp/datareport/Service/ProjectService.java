@@ -4,8 +4,11 @@ import com.fdp.datareport.Entity.Project;
 import com.fdp.datareport.Repository.AreaRepository;
 import com.fdp.datareport.Repository.ProjectRepository;
 import com.fdp.datareport.Repository.StatusRepository;
+import com.fdp.datareport.Repository.SprintRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +24,8 @@ public class ProjectService {
 
     @Autowired
     private StatusRepository statusRepository;
+    @Autowired
+    private SprintRepository sprintRepository;
 
     // Create a new project
     public Project createProject(Project project) {
@@ -69,11 +74,25 @@ public class ProjectService {
     }
 
     // Delete a project
+//    public boolean deleteProject(Long id) {
+//        if (projectRepository.existsById(id)) {
+//            sprintRepository.deleteByProject(id);
+//
+//            projectRepository.deleteById(id);
+//            return true;
+//        }
+//        return false;
+//    }
+    @Transactional
     public boolean deleteProject(Long id) {
-        if (projectRepository.existsById(id)) {
+        Optional<Project> projOpt = projectRepository.findById(id);
+        if (projOpt.isPresent()) {
+            // Delete all projects that belong to this area
+            sprintRepository.deleteByProject(projOpt.get());
+
+            // Then delete the area itself
             projectRepository.deleteById(id);
             return true;
         }
         return false;
-    }
-}
+}}
