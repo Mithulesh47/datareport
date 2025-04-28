@@ -8,8 +8,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // ✅ Import Snackbar
 import { StatusService } from '../services/status.service';
 import { GenericDialogComponent } from '../generic-dialog/generic-dialog.component';
+import { AlertComponent } from '../alert/alert.component'; // ✅ Import AlertComponent
 
 @Component({
   selector: 'app-status-manager',
@@ -23,7 +25,8 @@ import { GenericDialogComponent } from '../generic-dialog/generic-dialog.compone
     MatCardModule,
     MatIconModule,
     MatListModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSnackBarModule // ✅ Add this
   ],
   templateUrl: './status-manager.component.html',
   styleUrls: ['./status-manager.component.css']
@@ -37,6 +40,7 @@ export class StatusManagerComponent {
   sortAscending: boolean = true;
 
   private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar); // ✅ Inject Snackbar
   private statusService = inject(StatusService);
 
   constructor(private fb: FormBuilder) {
@@ -61,13 +65,32 @@ export class StatusManagerComponent {
     });
   }
 
+  // ✅ New reusable function
+  openAlert(type: 'success' | 'info' | 'error' | 'warning', title: string, message: string) {
+    if (type === 'error') {
+      this.dialog.open(AlertComponent, {
+        data: { title, message }
+      });
+    } else {
+      this.snackBar.open(message, 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+        panelClass: ['custom-snackbar']
+      });
+    }
+  }
+
   addStatus() {
     if (this.statusForm.valid) {
       this.statusService.addStatus(this.statusForm.value).subscribe((newStatus) => {
         this.statuses.push(newStatus);
         this.sortStatuses();
         this.statusForm.reset();
+        this.openAlert('success', 'Success', 'Status added successfully!');
       });
+    } else {
+      this.openAlert('error', 'Validation Error', 'Please fill all required fields correctly.');
     }
   }
 
@@ -87,7 +110,10 @@ export class StatusManagerComponent {
         this.statuses[index] = updatedStatus;
         this.sortStatuses();
         this.editIndex = null;
+        this.openAlert('success', 'Success', 'Status updated successfully!');
       });
+    } else {
+      this.openAlert('error', 'Validation Error', 'Please fix the errors before saving.');
     }
   }
 
@@ -111,6 +137,7 @@ export class StatusManagerComponent {
         this.statusService.deleteStatus(this.statuses[index].id).subscribe(() => {
           this.statuses.splice(index, 1);
           this.sortStatuses();
+          this.openAlert('success', 'Deleted', 'Status deleted successfully!');
         });
       }
       this.deleteIndex = null;

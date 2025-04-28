@@ -1,87 +1,95 @@
-<!-- Loading Indicator -->
-<div *ngIf="loading && !error" class="loading-container">
-    <mat-spinner diameter="50"></mat-spinner>
-</div>
+<div class="page-container">
 
-<!-- Error Message -->
-<div *ngIf="error && !loading" class="error-message">
-    <p>Error loading data. Please try again later.</p>
-</div>
+    <!-- Loading Indicator -->
+    <div *ngIf="loading && !error" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+    </div>
 
-<!-- Tab Group -->
-<mat-tab-group *ngIf="!loading && !error" backgroundColor="warn">
-    <mat-tab *ngFor="let areaName of areaNames; let idx = index" [label]="areaName">
-        <div *ngIf="hasProjects(areaName); else emptyTab">
+    <!-- Error Message -->
+    <div *ngIf="error && !loading" class="error-message">
+        <p>Error loading data. Please try again later.</p>
+    </div>
 
-            <div class="table-container">
-                <table mat-table [dataSource]="groupedProjects[areaName]" class="mat-elevation-z8" style="width: 100%">
+    <!-- Tab Group -->
+    <mat-tab-group *ngIf="!loading && !error" backgroundColor="warn">
+        <mat-tab *ngFor="let areaName of areaNames; let idx = index" [label]="areaName">
 
-                    <!-- Project Name -->
-                    <ng-container matColumnDef="projectName">
-                        <th mat-header-cell *matHeaderCellDef>Project Name</th>
-                        <td mat-cell *matCellDef="let project">{{ project.projectName }}</td>
-                    </ng-container>
+            <div *ngIf="hasProjects(areaName); else emptyTab">
 
-                    <!-- Description -->
-                    <ng-container matColumnDef="description">
-                        <th mat-header-cell *matHeaderCellDef>Description</th>
-                        <td mat-cell *matCellDef="let project">{{ project.description }}</td>
-                    </ng-container>
+                <div class="table-container">
+                    <table mat-table [dataSource]="groupedProjects[areaName]" class="mat-elevation-z8"
+                        style="width: 100%">
 
-                    <!-- Developer / POC -->
-                    <ng-container matColumnDef="developer">
-                        <th mat-header-cell *matHeaderCellDef>Developer / POC</th>
-                        <td mat-cell *matCellDef="let project">{{ project.developer }}</td>
-                    </ng-container>
+                        <!-- Project Name -->
+                        <ng-container matColumnDef="projectName">
+                            <th mat-header-cell *matHeaderCellDef>Project Name</th>
+                            <td mat-cell *matCellDef="let project">{{ project.projectName }}</td>
+                        </ng-container>
 
-                    <!-- JIRA -->
-                    <ng-container matColumnDef="jira">
-                        <th mat-header-cell *matHeaderCellDef>JIRA</th>
-                        <td mat-cell *matCellDef="let project">
-                            <a [href]="project.jira" target="_blank">{{ project.jira }}</a>
-                        </td>
-                    </ng-container>
+                        <!-- Description -->
+                        <ng-container matColumnDef="description">
+                            <th mat-header-cell *matHeaderCellDef>Description</th>
+                            <td mat-cell *matCellDef="let project">{{ project.description }}</td>
+                        </ng-container>
 
-                    <!-- Start Date -->
-                    <ng-container matColumnDef="startDate">
-                        <th mat-header-cell *matHeaderCellDef>Start Date</th>
-                        <td mat-cell *matCellDef="let project">{{ project.startDate | date:'dd/MM/yyyy' }}</td>
-                    </ng-container>
+                        <!-- Developer / POC -->
+                        <ng-container matColumnDef="developer">
+                            <th mat-header-cell *matHeaderCellDef>Developer / POC</th>
+                            <td mat-cell *matCellDef="let project">{{ project.developer }}</td>
+                        </ng-container>
 
-                    <!-- End Date -->
-                    <ng-container matColumnDef="endDate">
-                        <th mat-header-cell *matHeaderCellDef>End Date</th>
-                        <td mat-cell *matCellDef="let project">{{ project.endDate | date:'dd/MM/yyyy' }}</td>
-                    </ng-container>
+                        <!-- JIRA -->
+                        <ng-container matColumnDef="jira">
+                            <th mat-header-cell *matHeaderCellDef>JIRA</th>
+                            <td mat-cell *matCellDef="let project">
+                                <a [href]="project.jira" target="_blank">{{ project.jira }}</a>
+                            </td>
+                        </ng-container>
 
-                    <!-- Status -->
-                    <ng-container matColumnDef="status">
-                        <th mat-header-cell *matHeaderCellDef>Status</th>
-                        <td mat-cell *matCellDef="let project">{{ project.status?.statusName || '-' }}</td>
-                    </ng-container>
+                        <!-- Start Date -->
+                        <ng-container matColumnDef="startDate">
+                            <th mat-header-cell *matHeaderCellDef>Start Date</th>
+                            <td mat-cell *matCellDef="let project">{{ project.startDate | date:'dd/MM/yyyy' }}</td>
+                        </ng-container>
 
-                    <!-- Actions -->
-                    <ng-container matColumnDef="actions">
-                        <th mat-header-cell *matHeaderCellDef class="center-header">Action</th>
-                        <td mat-cell *matCellDef="let project" class="center-cell">
-                            <button mat-button color="primary" (click)="editProject(project)">Edit</button>
-                            <button mat-button color="warn" (click)="deleteProject(project)">Delete</button>
-                            <a mat-button [routerLink]="['/project', project.id, 'insight']">Insights</a>
-                        </td>
-                    </ng-container>
+                        <!-- End Date -->
+                        <ng-container matColumnDef="endDate">
+                            <th mat-header-cell *matHeaderCellDef>End Date</th>
+                            <td mat-cell *matCellDef="let project">{{ project.endDate | date:'dd/MM/yyyy' }}</td>
+                        </ng-container>
 
-                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-                </table>
+                        <!-- Status -->
+                        <ng-container matColumnDef="status">
+                            <th mat-header-cell *matHeaderCellDef>Status</th>
+                            <td mat-cell *matCellDef="let project">{{ project.status?.statusName || '-' }}</td>
+                        </ng-container>
 
-                <!-- Paginator -->
-                <mat-paginator [pageSizeOptions]="[5, 10, 20]" [pageSize]="5" showFirstLastButtons></mat-paginator>
+                        <!-- Actions -->
+                        <ng-container matColumnDef="actions">
+                            <th mat-header-cell *matHeaderCellDef class="center-header">Action</th>
+                            <td mat-cell *matCellDef="let project" class="center-cell">
+                                <button mat-button color="primary" (click)="editProject(project)">Edit</button>
+                                <button mat-button color="warn" (click)="deleteProject(project)">Delete</button>
+                                <a mat-button [routerLink]="['/project', project.id, 'insight']">Insights</a>
+                            </td>
+                        </ng-container>
+
+                        <!-- Table Headers and Rows -->
+                        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                    </table>
+
+                    <!-- Paginator -->
+                    <mat-paginator [pageSizeOptions]="[5, 10, 20]" [pageSize]="5" showFirstLastButtons></mat-paginator>
+                </div>
+
             </div>
 
-        </div>
+            <ng-template #emptyTab>
+                <p style="padding: 16px;">No projects available for this area.</p>
+            </ng-template>
 
-        <ng-template #emptyTab>
-            <p style="padding: 16px;">No projects available for this area.</p>
-        </ng-template>
-    </mat-tab>
-</mat-tab-group>
+        </mat-tab>
+    </mat-tab-group>
+
+</div>

@@ -8,8 +8,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // ✅ Import Snackbar
 import { AreaService } from '../services/area.service';
 import { GenericDialogComponent } from '../generic-dialog/generic-dialog.component';
+import { AlertComponent } from '../alert/alert.component';
 
 @Component({
   selector: 'app-area-manager',
@@ -23,7 +25,8 @@ import { GenericDialogComponent } from '../generic-dialog/generic-dialog.compone
     MatCardModule,
     MatIconModule,
     MatListModule,
-    MatDialogModule
+    MatDialogModule,
+    MatSnackBarModule // ✅ Add this
   ],
   templateUrl: './area-manager.component.html',
   styleUrls: ['./area-manager.component.css']
@@ -35,6 +38,7 @@ export class AreaManagerComponent {
   editIndex: number | null = null;
 
   private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar); // ✅ Inject Snackbar
   private areaService = inject(AreaService);
 
   constructor(private fb: FormBuilder) {
@@ -60,12 +64,45 @@ export class AreaManagerComponent {
     });
   }
 
+  // ✅ New Reusable Alert/Snackbar function
+  openAlert(type: 'success' | 'info' | 'error' | 'warning', title: string, message: string) {
+    if (type === 'error') {
+      this.dialog.open(AlertComponent, {
+        data: { title, message }
+      });
+    } else {
+      this.snackBar.open(message, 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+        panelClass: ['custom-snackbar']
+      });
+    }
+  }
+
   addArea() {
     if (this.areaForm.valid) {
       this.areaService.addArea(this.areaForm.value).subscribe((newArea) => {
         this.areas.push(newArea);
         this.areaForm.reset();
+        this.openAlert('success', 'Success', 'Area added successfully!');
       });
+    } else {
+      let errorMessages = [];
+
+      if (this.areaForm.get('name')?.hasError('required')) {
+        errorMessages.push('Area Name is required.');
+      }
+      if (this.areaForm.get('leadName')?.hasError('required')) {
+        errorMessages.push('Lead Name is required.');
+      }
+      if (this.areaForm.get('leadEmail')?.hasError('required')) {
+        errorMessages.push('Lead Email is required.');
+      } else if (this.areaForm.get('leadEmail')?.hasError('email')) {
+        errorMessages.push('Lead Email is invalid.');
+      }
+
+      this.openAlert('error', 'Validation Error', errorMessages.join('\n'));
     }
   }
 
@@ -85,7 +122,10 @@ export class AreaManagerComponent {
       this.areaService.updateArea(this.editForm.value).subscribe(updatedArea => {
         this.areas[index] = updatedArea;
         this.editIndex = null;
+        this.openAlert('success', 'Success', 'Area updated successfully!');
       });
+    } else {
+      this.openAlert('error', 'Validation Error', 'Please fix the errors before saving.');
     }
   }
 
@@ -107,6 +147,7 @@ export class AreaManagerComponent {
       if (result === true) {
         this.areaService.deleteArea(this.areas[index].id).subscribe(() => {
           this.areas.splice(index, 1);
+          this.openAlert('success', 'Deleted', 'Area deleted successfully!');
         });
       }
     });

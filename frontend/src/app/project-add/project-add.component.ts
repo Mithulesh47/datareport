@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,8 +7,11 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // ✅ Import Snackbar
+import { MatDialog, MatDialogModule } from '@angular/material/dialog'; // ✅ Import Dialog
 import { ProjectService } from '../services/project.service';
-import { MatCard, MatCardActions, MatCardModule } from '@angular/material/card';
+import { AlertComponent } from '../alert/alert.component'; // ✅ Import AlertComponent
 
 @Component({
   selector: 'app-project-add',
@@ -22,7 +25,9 @@ import { MatCard, MatCardActions, MatCardModule } from '@angular/material/card';
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
-    MatCardModule
+    MatCardModule,
+    MatSnackBarModule, // ✅ Add Snackbar module
+    MatDialogModule    // ✅ Add Dialog module
   ],
   templateUrl: './project-add.component.html',
   styleUrls: ['./project-add.component.css']
@@ -32,10 +37,11 @@ export class ProjectAddComponent implements OnInit {
   areaList: any[] = [];
   statusList: any[] = [];
 
-  constructor(
-    private fb: FormBuilder,
-    private projectService: ProjectService
-  ) {}
+  private projectService = inject(ProjectService);
+  private snackBar = inject(MatSnackBar); // ✅ Inject Snackbar
+  private dialog = inject(MatDialog);     // ✅ Inject Dialog
+
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
     this.projectForm = this.fb.group({
@@ -56,15 +62,35 @@ export class ProjectAddComponent implements OnInit {
   loadAreaList(): void {
     this.projectService.getAreas().subscribe({
       next: (data) => (this.areaList = data),
-      error: (err) => console.error('Error loading areas', err)
+      error: (err) => {
+        this.openAlert('error', 'Load Error', 'Failed to load areas.');
+      }
     });
   }
 
   loadStatusList(): void {
     this.projectService.getStatuses().subscribe({
       next: (data) => (this.statusList = data),
-      error: (err) => console.error('Error loading statuses', err)
+      error: (err) => {
+        this.openAlert('error', 'Load Error', 'Failed to load statuses.');
+      }
     });
+  }
+
+  // ✅ Reusable Alert/Snackbar function
+  openAlert(type: 'success' | 'info' | 'error' | 'warning', title: string, message: string) {
+    if (type === 'error') {
+      this.dialog.open(AlertComponent, {
+        data: { title, message }
+      });
+    } else {
+      this.snackBar.open(message, 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+        panelClass: ['custom-snackbar']
+      });
+    }
   }
 
   onSubmit(): void {
@@ -84,15 +110,15 @@ export class ProjectAddComponent implements OnInit {
 
       this.projectService.addProject(projectData).subscribe({
         next: (res) => {
-          console.log('Project saved successfully', res);
+          this.openAlert('success', 'Success', 'Project saved successfully!');
           this.projectForm.reset();
         },
         error: (err) => {
-          console.error('Error saving project', err);
+          this.openAlert('error', 'Save Error', 'Failed to save project.');
         }
       });
     } else {
-      console.log('Form is invalid');
+      this.openAlert('error', 'Validation Error', 'Please fill all required fields correctly.');
     }
   }
 }

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit, inject } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ProjectService } from '../services/project.service';
 import { AreaService } from '../services/area.service';
 import { StatusService } from '../services/status.service'; 
@@ -10,10 +10,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatButtonModule } from '@angular/material/button';
-import { CommonModule } from '@angular/common';  // Add this import
-import { ReactiveFormsModule } from '@angular/forms';  // Add this import
-import { Project } from '../models/project.model';  
+import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // ✅ Import Snackbar
+import { MatDialog, MatDialogModule } from '@angular/material/dialog'; // ✅ Import Dialog
+import { AlertComponent } from '../alert/alert.component'; // ✅ Import AlertComponent
+import { Project } from '../models/project.model';
 
 @Component({
   selector: 'app-project-edit',
@@ -25,9 +27,11 @@ import { MatCardModule } from '@angular/material/card';
     MatDatepickerModule,
     MatNativeDateModule,
     MatButtonModule,
-    CommonModule,  
+    CommonModule,
     ReactiveFormsModule,
-    MatCardModule
+    MatCardModule,
+    MatSnackBarModule, // ✅ Snackbar
+    MatDialogModule    // ✅ Dialog
   ],
   templateUrl: './project-edit.component.html',
   styleUrls: ['./project-edit.component.css']
@@ -36,19 +40,19 @@ export class ProjectEditComponent implements OnInit {
   projectForm!: FormGroup;
   areaList: any[] = [];
   statusList: any[] = [];
-  projectId: string = '';  // Keep this as a string from the route
+  projectId: string = '';
 
-  constructor(
-    private fb: FormBuilder,
-    private projectService: ProjectService,
-    private areaService: AreaService,
-    private statusService: StatusService,
-    private activatedRoute: ActivatedRoute,
-    private router: Router
-  ) {}
+  private projectService = inject(ProjectService);
+  private areaService = inject(AreaService);
+  private statusService = inject(StatusService);
+  private snackBar = inject(MatSnackBar); // ✅ Inject Snackbar
+  private dialog = inject(MatDialog);     // ✅ Inject Dialog
+  private router = inject(Router);
+  private activatedRoute = inject(ActivatedRoute);
+
+  constructor(private fb: FormBuilder) {}
 
   ngOnInit(): void {
-    // Get project ID from the route params
     this.projectId = this.activatedRoute.snapshot.paramMap.get('id')!;
 
     this.projectForm = this.fb.group({
@@ -67,30 +71,28 @@ export class ProjectEditComponent implements OnInit {
     this.loadProjectDetails();
   }
 
-  // Load area list for the dropdown
   loadAreaList(): void {
     this.areaService.getAreas().subscribe({
       next: (data) => (this.areaList = data),
-      error: (err) => console.error('Error loading areas', err)
+      error: (err) => {
+        this.openAlert('error', 'Load Error', 'Failed to load areas.');
+      }
     });
   }
 
-  // Load status list for the dropdown
   loadStatusList(): void {
     this.statusService.getStatuses().subscribe({
       next: (data) => (this.statusList = data),
-      error: (err) => console.error('Error loading statuses', err)
+      error: (err) => {
+        this.openAlert('error', 'Load Error', 'Failed to load statuses.');
+      }
     });
   }
 
-  // Load the details of the project to edit
   loadProjectDetails(): void {
-    // Convert projectId to number before passing to the service
-    const projectIdAsNumber = +this.projectId;  // Convert to number
-
+    const projectIdAsNumber = +this.projectId;
     this.projectService.getProjectById(projectIdAsNumber).subscribe({
       next: (project: Project) => {
-        // Populate the form with existing project data
         this.projectForm.patchValue({
           areaId: project.area?.id,
           projectName: project.projectName,
@@ -102,11 +104,28 @@ export class ProjectEditComponent implements OnInit {
           statusId: project.status?.id
         });
       },
-      error: (err) => console.error('Error fetching project details', err)
+      error: (err) => {
+        this.openAlert('error', 'Load Error', 'Failed to load project details.');
+      }
     });
   }
 
-  // Handle the form submission
+  // ✅ Reusable function
+  openAlert(type: 'success' | 'info' | 'error' | 'warning', title: string, message: string) {
+    if (type === 'error') {
+      this.dialog.open(AlertComponent, {
+        data: { title, message }
+      });
+    } else {
+      this.snackBar.open(message, 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+        panelClass: ['custom-snackbar']
+      });
+    }
+  }
+
   onSubmit(): void {
     if (this.projectForm.valid) {
       const formValue = this.projectForm.value;
@@ -121,21 +140,19 @@ export class ProjectEditComponent implements OnInit {
         status: { id: formValue.statusId }
       };
 
-      // Convert projectId to number before passing it to the service
-      const projectIdAsNumber = +this.projectId;  // Convert to number
+      const projectIdAsNumber = +this.projectId;
 
-      // Send the updated project data to the service
       this.projectService.editProject(projectIdAsNumber, updatedProject).subscribe({
         next: (res) => {
-          console.log('Project updated successfully', res);
-          this.router.navigate(['/']);  // Navigate back to the project view page
+          this.openAlert('success', 'Success', 'Project updated successfully!');
+          this.router.navigate(['/']); // ✅ Navigate back
         },
         error: (err) => {
-          console.error('Error updating project', err);
+          this.openAlert('error', 'Save Error', 'Failed to update project.');
         }
       });
     } else {
-      console.log('Form is invalid');
+      this.openAlert('error', 'Validation Error', 'Please fill all required fields correctly.');
     }
   }
 }

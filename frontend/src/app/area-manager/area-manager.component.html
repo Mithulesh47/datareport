@@ -20,7 +20,7 @@
     </mat-card-content>
 
     <mat-card-actions>
-      <button mat-raised-button color="primary" type="submit" [disabled]="areaForm.invalid">Submit</button>
+      <button mat-raised-button color="primary" type="submit">Submit</button>
     </mat-card-actions>
   </mat-card>
 </form>
@@ -53,24 +53,29 @@
 <!-- Edit Area Form -->
 <div *ngIf="editIndex !== null" class="editSection">
   <form [formGroup]="editForm" (ngSubmit)="saveEdit(editIndex)" class="edit-form">
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Area Name</mat-label>
-      <input matInput formControlName="name" placeholder="Edit Area Name" />
-    </mat-form-field>
+    <mat-card>
+      <mat-card-title>Edit Area</mat-card-title>
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Area Name</mat-label>
+          <input matInput formControlName="name" placeholder="Edit Area Name" />
+        </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Lead Name</mat-label>
-      <input matInput formControlName="leadName" placeholder="Edit Lead Name" />
-    </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Lead Name</mat-label>
+          <input matInput formControlName="leadName" placeholder="Edit Lead Name" />
+        </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Lead Email</mat-label>
-      <input matInput type="email" formControlName="leadEmail" placeholder="Edit Lead Email" />
-    </mat-form-field>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Lead Email</mat-label>
+          <input matInput type="email" formControlName="leadEmail" placeholder="Edit Lead Email" />
+        </mat-form-field>
+      </mat-card-content>
 
-    <div class="edit-buttons">
-      <button mat-raised-button color="primary" type="submit" [disabled]="editForm.invalid">Save</button>
-      <button mat-stroked-button type="button" (click)="cancelEdit()">Cancel</button>
-    </div>
+      <mat-card-actions align="end">
+        <button mat-raised-button color="primary" type="submit">Save</button>
+        <button mat-stroked-button type="button" (click)="cancelEdit()">Cancel</button>
+      </mat-card-actions>
+    </mat-card>
   </form>
 </div>

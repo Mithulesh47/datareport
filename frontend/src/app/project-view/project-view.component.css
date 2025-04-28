@@ -1,7 +1,22 @@
-.center-header {
-    text-align: center;
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 64px);
+    /* Adjust 64px if your toolbar is different */
 }
 
-.center-cell {
-    text-align: center;
+.loading-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.error-message {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: red;
+    font-size: 18px;
 }

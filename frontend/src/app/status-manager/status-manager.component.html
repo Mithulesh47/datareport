@@ -49,12 +49,12 @@
 <!-- Edit Form -->
 <div *ngIf="editIndex !== null" class="editSection">
     <form [formGroup]="editForm" (ngSubmit)="saveEdit(editIndex)" class="edit-form">
-        <mat-form-field appearance="fill" class="full-width">
+        <mat-form-field appearance="outline" class="full-width">
             <mat-label>Status Name</mat-label>
             <input matInput formControlName="statusName" placeholder="Edit status name" />
         </mat-form-field>
 
-        <mat-form-field appearance="fill" class="full-width">
+        <mat-form-field appearance="outline" class="full-width">
             <mat-label>Percentage</mat-label>
             <input matInput type="number" formControlName="percentage" min="0" max="100"
                 placeholder="Edit percentage" />

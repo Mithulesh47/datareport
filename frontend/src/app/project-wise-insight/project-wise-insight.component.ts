@@ -1,5 +1,3 @@
-// project-wise-insight.component.ts
-
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -13,6 +11,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // ✅ Import Snackbar
 import { ActivatedRoute } from '@angular/router';
 import { SprintService } from '../services/sprint.service';
 import { StatusService } from '../services/status.service';
@@ -35,6 +34,7 @@ import { SprintProgressChartComponent } from '../sprint-progress-chart/sprint-pr
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatSnackBarModule, // ✅ Snackbar module
     SprintProgressChartComponent
   ],
   templateUrl: './project-wise-insight.component.html',
@@ -48,8 +48,10 @@ export class ProjectWiseInsightComponent implements OnInit {
   editIndex: number | null = null;
   projectId!: number;
   showChart: boolean = true;
+
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar); // ✅ Inject Snackbar
   private sprintService = inject(SprintService);
   private statusService = inject(StatusService);
   private route = inject(ActivatedRoute);
@@ -84,14 +86,24 @@ export class ProjectWiseInsightComponent implements OnInit {
   }
 
   loadSprints() {
-    this.sprintService.getSprints(this.projectId).subscribe(sprints => {
-      this.sprints = [...sprints]; // 🟢 ensure array reference is replaced
+    this.sprintService.getSprints(this.projectId).subscribe({
+      next: (sprints) => {
+        this.sprints = [...sprints];
+      },
+      error: (err) => {
+        this.openAlert('error', 'Load Error', 'Failed to load sprints.');
+      }
     });
   }
 
   loadStatuses() {
-    this.statusService.getStatuses().subscribe((statuses: any[]) => {
-      this.statusList = statuses;
+    this.statusService.getStatuses().subscribe({
+      next: (statuses: any[]) => {
+        this.statusList = statuses;
+      },
+      error: (err) => {
+        this.openAlert('error', 'Load Error', 'Failed to load statuses.');
+      }
     });
   }
 
@@ -101,10 +113,18 @@ export class ProjectWiseInsightComponent implements OnInit {
         ...this.sprintForm.value,
         sprintFor: { id: this.sprintForm.value.sprintFor.id }
       };
-      this.sprintService.createSprint(this.projectId, sprintData).subscribe((newSprint) => {
-        this.sprints = [...this.sprints, newSprint]; // 🟢 triggers chart update
-        this.sprintForm.reset();
+      this.sprintService.createSprint(this.projectId, sprintData).subscribe({
+        next: (newSprint) => {
+          this.sprints = [...this.sprints, newSprint];
+          this.sprintForm.reset();
+          this.openAlert('success', 'Success', 'Sprint added successfully!');
+        },
+        error: (err) => {
+          this.openAlert('error', 'Save Error', 'Failed to add sprint.');
+        }
       });
+    } else {
+      this.openAlert('error', 'Validation Error', 'Please fill all required fields correctly.');
     }
   }
 
@@ -130,12 +150,18 @@ export class ProjectWiseInsightComponent implements OnInit {
         ...this.editForm.value,
         sprintFor: { id: this.editForm.value.sprintFor.id }
       };
-      this.sprintService.updateSprint(sprintId, sprintData).subscribe(updatedSprint => {
-        this.sprints = this.sprints.map((s, i) =>
-          i === index ? updatedSprint : s
-        ); // 🟢 replace with new array
-        this.editIndex = null;
+      this.sprintService.updateSprint(sprintId, sprintData).subscribe({
+        next: (updatedSprint) => {
+          this.sprints = this.sprints.map((s, i) => i === index ? updatedSprint : s);
+          this.editIndex = null;
+          this.openAlert('success', 'Success', 'Sprint updated successfully!');
+        },
+        error: (err) => {
+          this.openAlert('error', 'Update Error', 'Failed to update sprint.');
+        }
       });
+    } else {
+      this.openAlert('error', 'Validation Error', 'Please fix the errors before saving.');
     }
   }
 
@@ -156,10 +182,32 @@ export class ProjectWiseInsightComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result: boolean) => {
       if (result === true) {
         const deletedId = this.sprints[index].id;
-        this.sprintService.deleteSprint(deletedId).subscribe(() => {
-          this.sprints = this.sprints.filter((_, i) => i !== index); // 🟢 trigger update
+        this.sprintService.deleteSprint(deletedId).subscribe({
+          next: () => {
+            this.sprints = this.sprints.filter((_, i) => i !== index);
+            this.openAlert('success', 'Deleted', 'Sprint deleted successfully!');
+          },
+          error: (err) => {
+            this.openAlert('error', 'Delete Error', 'Failed to delete sprint.');
+          }
         });
       }
     });
+  }
+
+  // ✅ Reusable Snackbar + Alert function
+  openAlert(type: 'success' | 'info' | 'error' | 'warning', title: string, message: string) {
+    if (type === 'error') {
+      this.dialog.open(GenericDialogComponent, {
+        data: { title, message, buttonText: 'Close' }
+      });
+    } else {
+      this.snackBar.open(message, 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'bottom',
+        panelClass: ['custom-snackbar']
+      });
+    }
   }
 }
