@@ -29,18 +29,18 @@ export const routes: Routes = [
         (m) => m.ProjectEditComponent
       )
   },
-  {
-    path: '',
-    loadComponent: () =>
-      import('./project-view/project-view.component').then(
-        (m) => m.ProjectViewComponent
-      )
-  },
+    {
+      path: '',
+      loadComponent: () =>
+        import('./project-view/project-view.component').then(
+          (m) => m.ProjectViewComponent
+        )
+    },
   {
     path: 'plot-section',
     loadComponent: () =>
-      import('./area-wise-project-chart/area-wise-project-chart.component').then(
-        (m) => m.AreaWiseProjectChartComponent
+      import('./plots/plots.component').then(
+        (m) => m.PlotsComponent
       )
   },
   {
@@ -48,6 +48,13 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./project-wise-insight/project-wise-insight.component').then(
         (m) => m.ProjectWiseInsightComponent
+      )
+  },
+  {
+    path: 'scrum-section',
+    loadComponent: () =>
+      import('./velocity-section/velocity-section.component').then(
+        (m) => m.VelocitySectionComponent   
       )
   }
 ];
