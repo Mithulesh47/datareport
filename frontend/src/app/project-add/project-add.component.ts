@@ -114,7 +114,8 @@ export class ProjectAddComponent implements OnInit {
           this.projectForm.reset();
         },
         error: (err) => {
-          this.openAlert('error', 'Save Error', 'Failed to save project.');
+          const message = err.error.message[0].split(":")[1]?.trim() || "";
+          this.openAlert('error', 'Save Error', message);
         }
       });
     } else {

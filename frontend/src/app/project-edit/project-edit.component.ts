@@ -148,7 +148,8 @@ export class ProjectEditComponent implements OnInit {
           this.router.navigate(['/']); // ✅ Navigate back
         },
         error: (err) => {
-          this.openAlert('error', 'Save Error', 'Failed to update project.');
+          const message = err.error.message[0].split(":")[1]?.trim() || "";
+          this.openAlert('error', 'Save Error', message);
         }
       });
     } else {

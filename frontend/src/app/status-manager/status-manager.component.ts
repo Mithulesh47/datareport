@@ -81,18 +81,25 @@ export class StatusManagerComponent {
     }
   }
 
-  addStatus() {
-    if (this.statusForm.valid) {
-      this.statusService.addStatus(this.statusForm.value).subscribe((newStatus) => {
+addStatus() {
+  if (this.statusForm.valid) {
+    this.statusService.addStatus(this.statusForm.value).subscribe({
+      next: (newStatus) => {
         this.statuses.push(newStatus);
         this.sortStatuses();
         this.statusForm.reset();
         this.openAlert('success', 'Success', 'Status added successfully!');
-      });
-    } else {
-      this.openAlert('error', 'Validation Error', 'Please fill all required fields correctly.');
-    }
+      },
+      error: (err) => {
+        const message = err.error.message[0].split(":")[1]?.trim() || "";
+        this.openAlert('error', 'Error', message);
+      }
+    });
+  } else {
+    this.openAlert('error', 'Validation Error', 'Please fill all required fields correctly.');
   }
+}
+
 
   enableEdit(index: number) {
     this.editIndex = index;
@@ -104,18 +111,25 @@ export class StatusManagerComponent {
     });
   }
 
-  saveEdit(index: number) {
-    if (this.editForm.valid) {
-      this.statusService.updateStatus(this.editForm.value).subscribe(updatedStatus => {
+saveEdit(index: number) {
+  if (this.editForm.valid) {
+    this.statusService.updateStatus(this.editForm.value).subscribe({
+      next: (updatedStatus) => {
         this.statuses[index] = updatedStatus;
         this.sortStatuses();
         this.editIndex = null;
         this.openAlert('success', 'Success', 'Status updated successfully!');
-      });
-    } else {
-      this.openAlert('error', 'Validation Error', 'Please fix the errors before saving.');
-    }
+      },
+      error: (err) => {
+        const message = err.error.message[0].split(":")[1]?.trim() || "Failed to update status. Please try again.";
+        this.openAlert('error', 'Update Failed', message);
+      }
+    });
+  } else {
+    this.openAlert('error', 'Validation Error', 'Please fix the errors before saving.');
   }
+}
+
 
   cancelEdit() {
     this.editIndex = null;

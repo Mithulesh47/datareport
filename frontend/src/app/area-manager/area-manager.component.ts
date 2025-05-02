@@ -64,7 +64,7 @@ export class AreaManagerComponent {
     });
   }
 
-  // ✅ New Reusable Alert/Snackbar function
+
   openAlert(type: 'success' | 'info' | 'error' | 'warning', title: string, message: string) {
     if (type === 'error') {
       this.dialog.open(AlertComponent, {
@@ -117,17 +117,24 @@ export class AreaManagerComponent {
     });
   }
 
-  saveEdit(index: number) {
-    if (this.editForm.valid) {
-      this.areaService.updateArea(this.editForm.value).subscribe(updatedArea => {
+saveEdit(index: number) {
+  if (this.editForm.valid) {
+    this.areaService.updateArea(this.editForm.value).subscribe({
+      next: (updatedArea) => {
         this.areas[index] = updatedArea;
         this.editIndex = null;
         this.openAlert('success', 'Success', 'Area updated successfully!');
-      });
-    } else {
-      this.openAlert('error', 'Validation Error', 'Please fix the errors before saving.');
-    }
+      },
+      error: (err) => {
+        const message = err.error.message?.[0]?.split(":")[1]?.trim() || 'Failed to update area. Please try again.';
+        this.openAlert('error', 'Update Failed', message);
+      }
+    });
+  } else {
+    this.openAlert('error', 'Validation Error', 'Please fix the errors before saving.');
   }
+}
+
 
   cancelEdit() {
     this.editIndex = null;

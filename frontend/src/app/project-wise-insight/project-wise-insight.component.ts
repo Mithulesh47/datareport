@@ -11,12 +11,14 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // ✅ Import Snackbar
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
+
 import { SprintService } from '../services/sprint.service';
 import { StatusService } from '../services/status.service';
 import { GenericDialogComponent } from '../generic-dialog/generic-dialog.component';
 import { SprintProgressChartComponent } from '../sprint-progress-chart/sprint-progress-chart.component';
+import { AlertComponent } from '../alert/alert.component'; // ✅ Import only (do not add to `imports`)
 
 @Component({
   selector: 'app-project-wise-insight',
@@ -34,7 +36,7 @@ import { SprintProgressChartComponent } from '../sprint-progress-chart/sprint-pr
     MatSelectModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatSnackBarModule, // ✅ Snackbar module
+    MatSnackBarModule,
     SprintProgressChartComponent
   ],
   templateUrl: './project-wise-insight.component.html',
@@ -51,7 +53,7 @@ export class ProjectWiseInsightComponent implements OnInit {
 
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
-  private snackBar = inject(MatSnackBar); // ✅ Inject Snackbar
+  private snackBar = inject(MatSnackBar);
   private sprintService = inject(SprintService);
   private statusService = inject(StatusService);
   private route = inject(ActivatedRoute);
@@ -90,7 +92,7 @@ export class ProjectWiseInsightComponent implements OnInit {
       next: (sprints) => {
         this.sprints = [...sprints];
       },
-      error: (err) => {
+      error: () => {
         this.openAlert('error', 'Load Error', 'Failed to load sprints.');
       }
     });
@@ -101,7 +103,7 @@ export class ProjectWiseInsightComponent implements OnInit {
       next: (statuses: any[]) => {
         this.statusList = statuses;
       },
-      error: (err) => {
+      error: () => {
         this.openAlert('error', 'Load Error', 'Failed to load statuses.');
       }
     });
@@ -120,7 +122,8 @@ export class ProjectWiseInsightComponent implements OnInit {
           this.openAlert('success', 'Success', 'Sprint added successfully!');
         },
         error: (err) => {
-          this.openAlert('error', 'Save Error', 'Failed to add sprint.');
+          const message = err.error.message[0].split(":")[1]?.trim() || "";
+          this.openAlert('error', 'Save Error', message);
         }
       });
     } else {
@@ -157,7 +160,8 @@ export class ProjectWiseInsightComponent implements OnInit {
           this.openAlert('success', 'Success', 'Sprint updated successfully!');
         },
         error: (err) => {
-          this.openAlert('error', 'Update Error', 'Failed to update sprint.');
+          const message = err.error.message[0].split(":")[1]?.trim() || "";
+          this.openAlert('error', 'Update Error', message);
         }
       });
     } else {
@@ -187,7 +191,7 @@ export class ProjectWiseInsightComponent implements OnInit {
             this.sprints = this.sprints.filter((_, i) => i !== index);
             this.openAlert('success', 'Deleted', 'Sprint deleted successfully!');
           },
-          error: (err) => {
+          error: () => {
             this.openAlert('error', 'Delete Error', 'Failed to delete sprint.');
           }
         });
@@ -195,11 +199,11 @@ export class ProjectWiseInsightComponent implements OnInit {
     });
   }
 
-  // ✅ Reusable Snackbar + Alert function
+  // ✅ Snackbar for success/info | AlertComponent for error
   openAlert(type: 'success' | 'info' | 'error' | 'warning', title: string, message: string) {
     if (type === 'error') {
-      this.dialog.open(GenericDialogComponent, {
-        data: { title, message, buttonText: 'Close' }
+      this.dialog.open(AlertComponent, {
+        data: { title, message }
       });
     } else {
       this.snackBar.open(message, 'Close', {
