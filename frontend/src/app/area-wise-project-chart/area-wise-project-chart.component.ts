@@ -164,9 +164,12 @@ export class AreaWiseProjectChartComponent implements OnInit {
 groupProjectsByArea(): void {
   if (this.areas && this.projects) {
     this.areas.forEach(area => {
-      area.projects = this.projects.filter(project =>
+      const areaProjects = this.projects.filter(project =>
         project.area && project.area.id === area.id
       );
+
+      // Sort the projects by status percentage descending
+      area.projects = areaProjects.sort((a, b) => b.status.percentage - a.status.percentage);
     });
   }
 }

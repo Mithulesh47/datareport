@@ -85,9 +85,9 @@ export class VelocityPlotComponent implements OnInit {
         sprintMap.get(sprintLabels[i])?.push(v.velocity ?? 0);
       });
 
-      for (let i = sortedSprints.length; i < 3; i++) {
-        sprintMap.get(sprintLabels[i])?.push(0);
-      }
+      // for (let i = sortedSprints.length; i < 3; i++) {
+      //   sprintMap.get(sprintLabels[i])?.push(0);
+      // }
     });
 
     const avgVelocities = labels.map((_, i) => {
@@ -100,10 +100,10 @@ export class VelocityPlotComponent implements OnInit {
           count++;
         }
       });
-      return count ? +(total / count).toFixed(2) : 0;
+      return count ===0 ? 0: +(total / count).toFixed(2);
     });
 
-    const sprintColors = ['#42A5F5', '#66BB6A', '#FFA726'];
+    const sprintColors = ['#b09cc8', '#66BB6A', '#FFA726'];
 
     const datasets: ChartData<'bar' | 'line'>['datasets'] = sprintLabels.map((label, i) => ({
       label,

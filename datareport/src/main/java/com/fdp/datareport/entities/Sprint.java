@@ -31,12 +31,16 @@ public class Sprint {
     @Temporal(TemporalType.DATE)
     @NotNull(message="Sprint End Date is required")
     private Date sprintEndDate;
+
     @NotNull(message="Sprint Jira is required")
+    @Lob
     private String sprintJira;
 
-    @Column(length = 1000)
+    @Lob
     private String sprintDescription;
+
     @NotNull(message="Assignee is required")
+    @Lob
     private String assignedTo;
 
     // Many sprints can be for one status

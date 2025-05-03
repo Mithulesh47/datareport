@@ -22,10 +22,15 @@ public class Project {
     private Long id;
     @NotNull(message="Project Name is required")
     private String projectName;
+    @Lob
     private String description;
+
     @NotNull(message="Developer Name is required")
+    @Lob
     private String developer;
+
     @NotNull(message="Jira is required")
+    @Lob
     private String jira;
 
     @ManyToOne(fetch = FetchType.EAGER)

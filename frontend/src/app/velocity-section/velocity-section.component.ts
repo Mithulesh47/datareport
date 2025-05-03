@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -30,7 +30,8 @@ import { AlertComponent } from '../alert/alert.component';
     MatNativeDateModule,
     MatIconModule,
     MatSnackBarModule,
-    MatDialogModule
+    MatDialogModule,
+    FormsModule
   ],
   templateUrl: './velocity-section.component.html',
   styleUrls: ['./velocity-section.component.css'],
@@ -43,6 +44,9 @@ export class VelocitySectionComponent implements OnInit {
   velocities: any[] = [];
   editingScrumAreaId: number | null = null;
   editingVelocityId: number | null = null;
+  selectedScrumAreaId: number | null = null;
+
+
 
   constructor(
     private fb: FormBuilder,
@@ -123,7 +127,10 @@ export class VelocitySectionComponent implements OnInit {
     this.scrumAreaForm.patchValue(area);
     this.editingScrumAreaId = area.id;
   }
-
+  get filteredVelocities() {
+    if (!this.selectedScrumAreaId) return this.velocities;
+    return this.velocities.filter(v => v.scrumArea?.id === this.selectedScrumAreaId);
+  }
   deleteScrumArea(id: number) {
     const dialogRef = this.dialog.open(GenericDialogComponent, {
       data: {

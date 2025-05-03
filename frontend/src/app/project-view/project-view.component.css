@@ -12,6 +12,15 @@
     align-items: center;
 }
 
+.lead-info {
+    display: flex;
+    gap: 40px;
+    margin: 16px 0;
+    font-size: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 .error-message {
     flex: 1;
     display: flex;

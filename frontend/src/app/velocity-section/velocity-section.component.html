@@ -39,7 +39,6 @@
         <hr />
         <h3>List of Scrum Area:</h3>
 
-        <!-- Scrum Area Grid Listing -->
         <div class="card-grid">
             <mat-card *ngFor="let a of scrumAreas" class="list-card">
                 <mat-card-title>{{ a.areaName }}</mat-card-title>
@@ -115,9 +114,18 @@
         <hr />
         <h3>List of Sprint and Velocity:</h3>
 
-        <!-- Velocity Grid Listing -->
+        <!-- 🔍 Filter by Scrum Area -->
+        <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Filter by Scrum Area</mat-label>
+            <mat-select [(ngModel)]="selectedScrumAreaId">
+                <mat-option [value]="null">-- All Areas --</mat-option>
+                <mat-option *ngFor="let area of scrumAreas" [value]="area.id">{{ area.areaName }}</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <!-- 🎯 Velocity Grid Listing (Filtered) -->
         <div class="card-grid">
-            <mat-card *ngFor="let v of velocities" class="list-card">
+            <mat-card *ngFor="let v of filteredVelocities" class="list-card">
                 <mat-card-title>{{ v.sprintName }}</mat-card-title>
                 <mat-card-content>
                     <div class="info-row">
@@ -146,4 +154,5 @@
             </mat-card>
         </div>
     </div>
+
 </div>

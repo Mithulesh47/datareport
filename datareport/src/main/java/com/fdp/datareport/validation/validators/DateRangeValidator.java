@@ -40,19 +40,19 @@ public class DateRangeValidator implements ConstraintValidator<ValidDateRange, O
 
             Date startDate = (Date) startObj;
             Date endDate = (Date) endObj;
+
             if (startDate.after(endDate)) {
-                // Add the custom error message to the validation context
                 context.disableDefaultConstraintViolation();
-                context.buildConstraintViolationWithTemplate("Start date must be before end date")
-                        .addPropertyNode(startFieldName) // Optional: mark the specific field in the error message
+                context.buildConstraintViolationWithTemplate("Start date must not be after end date")
+                        .addPropertyNode(startFieldName)
                         .addConstraintViolation();
                 return false;
             }
 
-            System.out.println(startDate.before(endDate));
-            return startDate.before(endDate);
+            return true;
         } catch (Exception e) {
-            return false; // Invalid if reflection fails
+            return false; // Reflection failed
         }
     }
+
 }

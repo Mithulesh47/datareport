@@ -16,9 +16,10 @@ import { ActivatedRoute } from '@angular/router';
 
 import { SprintService } from '../services/sprint.service';
 import { StatusService } from '../services/status.service';
+import { ProjectService } from '../services/project.service'; // ✅ Add this
 import { GenericDialogComponent } from '../generic-dialog/generic-dialog.component';
 import { SprintProgressChartComponent } from '../sprint-progress-chart/sprint-progress-chart.component';
-import { AlertComponent } from '../alert/alert.component'; // ✅ Import only (do not add to `imports`)
+import { AlertComponent } from '../alert/alert.component';
 
 @Component({
   selector: 'app-project-wise-insight',
@@ -49,13 +50,16 @@ export class ProjectWiseInsightComponent implements OnInit {
   editForm: FormGroup;
   editIndex: number | null = null;
   projectId!: number;
+  projectName: string = ''; // ✅ Add this
   showChart: boolean = true;
 
+  // Inject dependencies
   private fb = inject(FormBuilder);
   private dialog = inject(MatDialog);
   private snackBar = inject(MatSnackBar);
   private sprintService = inject(SprintService);
   private statusService = inject(StatusService);
+  private projectService = inject(ProjectService); // ✅ Add this
   private route = inject(ActivatedRoute);
 
   constructor() {
@@ -83,8 +87,21 @@ export class ProjectWiseInsightComponent implements OnInit {
 
   ngOnInit(): void {
     this.projectId = +this.route.snapshot.paramMap.get('id')!;
+    this.loadProjectName(); // ✅ Load project name
     this.loadSprints();
     this.loadStatuses();
+  }
+
+  // ✅ Load project details by ID
+  loadProjectName(): void {
+    this.projectService.getProjectById(this.projectId).subscribe({
+      next: (project) => {
+        this.projectName = project.projectName;
+      },
+      error: () => {
+        this.openAlert('error', 'Load Error', 'Failed to load project details.');
+      }
+    });
   }
 
   loadSprints() {
@@ -199,7 +216,6 @@ export class ProjectWiseInsightComponent implements OnInit {
     });
   }
 
-  // ✅ Snackbar for success/info | AlertComponent for error
   openAlert(type: 'success' | 'info' | 'error' | 'warning', title: string, message: string) {
     if (type === 'error') {
       this.dialog.open(AlertComponent, {

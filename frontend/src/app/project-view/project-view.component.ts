@@ -4,6 +4,7 @@ import { ProjectService } from '../services/project.service';
 import { AreaService, Area } from '../services/area.service';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { GenericDialogComponent } from '../generic-dialog/generic-dialog.component';
+import { AlertComponent } from '../alert/alert.component';
 
 import { CommonModule } from '@angular/common';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
@@ -12,7 +13,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // ✅ Import Snackbar
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-project-view',
@@ -27,7 +28,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; //
     MatTabsModule,
     RouterModule,
     MatDialogModule,
-    MatSnackBarModule // ✅ Add SnackbarModule
+    MatSnackBarModule
   ],
   templateUrl: './project-view.component.html',
   styleUrls: ['./project-view.component.css']
@@ -47,6 +48,7 @@ export class ProjectViewComponent implements OnInit {
   dataSource: any[] = [];
   groupedProjects: { [areaName: string]: MatTableDataSource<any> } = {};
   areaNames: string[] = [];
+  areaDetails: Area[] = [];
   error: boolean = false;
   loading: boolean = true;
 
@@ -54,8 +56,8 @@ export class ProjectViewComponent implements OnInit {
 
   private projectService = inject(ProjectService);
   private areaService = inject(AreaService);
-  private snackBar = inject(MatSnackBar); // ✅ Inject Snackbar
-  private dialog = inject(MatDialog);     // ✅ Inject Dialog
+  private snackBar = inject(MatSnackBar);
+  private dialog = inject(MatDialog);
   private router = inject(Router);
 
   ngOnInit(): void {
@@ -75,7 +77,7 @@ export class ProjectViewComponent implements OnInit {
         this.dataSource = data;
         this.groupProjectsByArea();
       },
-      error: (err) => {
+      error: () => {
         this.openAlert('error', 'Fetch Error', 'Error fetching projects.');
         this.error = true;
       },
@@ -88,10 +90,11 @@ export class ProjectViewComponent implements OnInit {
   loadAreas(): void {
     this.areaService.getAreas().subscribe({
       next: (areas) => {
+        this.areaDetails = areas;
         this.areaNames = areas.map((area: Area) => area.name);
         this.groupProjectsByArea();
       },
-      error: (err) => {
+      error: () => {
         this.openAlert('error', 'Fetch Error', 'Error fetching areas.');
         this.error = true;
       }
@@ -118,6 +121,10 @@ export class ProjectViewComponent implements OnInit {
     }, 0);
   }
 
+  getLeadByArea(areaName: string): Area | undefined {
+    return this.areaDetails.find(area => area.name === areaName);
+  }
+
   editProject(project: any): void {
     this.router.navigate(['/edit-project', project.id]);
   }
@@ -138,7 +145,7 @@ export class ProjectViewComponent implements OnInit {
             this.openAlert('success', 'Deleted', 'Project deleted successfully!');
             this.loadProjects();
           },
-          error: (err) => {
+          error: () => {
             this.openAlert('error', 'Delete Error', 'Failed to delete project.');
           }
         });
@@ -146,18 +153,18 @@ export class ProjectViewComponent implements OnInit {
     });
   }
 
-  // ✅ Reusable Snackbar + Alert function
+  // ✅ Unified alert system: snackbar for success/info, dialog for error/warning
   openAlert(type: 'success' | 'info' | 'error' | 'warning', title: string, message: string) {
-    if (type === 'error') {
-      this.dialog.open(GenericDialogComponent, {
-        data: { title, message, buttonText: 'Close' }
-      });
-    } else {
+    if (type === 'success' || type === 'info') {
       this.snackBar.open(message, 'Close', {
         duration: 3000,
         horizontalPosition: 'center',
         verticalPosition: 'bottom',
         panelClass: ['custom-snackbar']
+      });
+    } else {
+      this.dialog.open(AlertComponent, {
+        data: { title, message }
       });
     }
   }
