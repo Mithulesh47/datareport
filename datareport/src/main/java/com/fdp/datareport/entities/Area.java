@@ -25,8 +25,4 @@ public class Area {
     private String leadName;
     @NotNull(message="Lead Email is required")
     private String leadEmail;
-
-
-
-
 }
