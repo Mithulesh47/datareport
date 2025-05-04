@@ -14,7 +14,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = ValidPercentageValidator.class)
 public @interface ValidPercentage {
-    String message() default "Percentage must not be between 0 and 100";
+    String message() default "Percentage must be between 0 and 100";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

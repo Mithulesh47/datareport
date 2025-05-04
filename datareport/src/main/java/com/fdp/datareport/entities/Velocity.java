@@ -27,8 +27,10 @@ public class Velocity {
     @NotNull(message="Sprint End Date is required")
     private LocalDate sprintEndDate;
 
+    @NotNull(message = "Scrum Area is required") // MANDATORY
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "area_id", nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private ScrumArea scrumArea;
+
 }
