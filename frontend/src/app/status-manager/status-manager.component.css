@@ -5,6 +5,7 @@
     padding: 20px;
     font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
     background-color: #fafafa;
+    word-break: break-word;
 }
 
 .form-container {
@@ -16,6 +17,7 @@ mat-card {
     box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.05);
     border-radius: 14px;
     transition: box-shadow 0.3s ease, transform 0.3s ease;
+    word-break: break-word;
 }
 
 mat-card:hover {
@@ -27,10 +29,12 @@ mat-card-title {
     font-size: 22px;
     font-weight: 600;
     color: #1a1a1a;
+    word-break: break-word;
 }
 
 mat-card-content {
     padding: 24px;
+    word-break: break-word;
 }
 
 .full-width {
@@ -38,10 +42,17 @@ mat-card-content {
     margin-bottom: 20px;
 }
 
+mat-form-field input,
+mat-form-field textarea {
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
 mat-card-actions {
     display: flex;
     justify-content: flex-end;
     padding: 16px 24px 24px;
+    flex-wrap: wrap;
 }
 
 h3 {
@@ -50,6 +61,7 @@ h3 {
     color: #111;
     font-weight: 600;
     margin-bottom: 16px;
+    word-break: break-word;
 }
 
 /* Status Cards Section */
@@ -67,6 +79,7 @@ h3 {
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     transform: scale(1);
     cursor: pointer;
+    word-break: break-word;
 }
 
 .status-card:hover {
@@ -79,6 +92,8 @@ h3 {
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .status-info {
@@ -89,10 +104,12 @@ h3 {
     color: #333;
     line-height: 1.6;
     letter-spacing: 0.25px;
+    word-break: break-word;
 }
 
 .status-info div {
     font-weight: 400;
+    word-break: break-word;
 }
 
 .status-info div strong {
@@ -101,12 +118,14 @@ h3 {
     color: #666;
     margin-right: 4px;
     letter-spacing: 0.5px;
+    word-break: break-word;
 }
 
 .status-actions {
     display: flex;
     gap: 8px;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 button[mat-icon-button] {
@@ -137,18 +156,21 @@ button[color="warn"] mat-icon {
     background: #ffffff;
     border-radius: 14px;
     box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+    word-break: break-word;
 }
 
 .edit-form {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    word-break: break-word;
 }
 
 .edit-buttons {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 hr {

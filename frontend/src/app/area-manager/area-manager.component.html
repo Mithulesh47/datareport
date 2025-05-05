@@ -33,9 +33,9 @@
   <mat-card class="area-card" *ngFor="let area of areas; let i = index">
     <div *ngIf="editIndex !== i" class="area-view">
       <div class="area-info">
-        <div><strong>Area Name:</strong> {{ area.name }}</div>
-        <div><strong>Lead Name:</strong> {{ area.leadName }}</div>
-        <div><strong>Lead Email:</strong> {{ area.leadEmail }}</div>
+        <div matTooltip="{{ area.name }}"><strong>Area Name:</strong> {{ area.name }}</div>
+        <div matTooltip="{{ area.leadName }}"><strong>Lead Name:</strong> {{ area.leadName }}</div>
+        <div matTooltip="{{ area.leadEmail }}"><strong>Lead Email:</strong> {{ area.leadEmail }}</div>
       </div>
 
       <div class="area-actions">

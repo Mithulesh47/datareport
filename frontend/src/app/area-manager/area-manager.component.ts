@@ -12,7 +12,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; //
 import { AreaService } from '../services/area.service';
 import { GenericDialogComponent } from '../generic-dialog/generic-dialog.component';
 import { AlertComponent } from '../alert/alert.component';
-
+import { MatTooltipModule } from '@angular/material/tooltip';
 @Component({
   selector: 'app-area-manager',
   standalone: true,
@@ -26,7 +26,8 @@ import { AlertComponent } from '../alert/alert.component';
     MatIconModule,
     MatListModule,
     MatDialogModule,
-    MatSnackBarModule // ✅ Add this
+    MatSnackBarModule,
+    MatTooltipModule // ✅ Add this
   ],
   templateUrl: './area-manager.component.html',
   styleUrls: ['./area-manager.component.css']

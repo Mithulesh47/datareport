@@ -5,7 +5,6 @@
     padding: 20px;
     font-family: 'Inter', 'Roboto', 'Segoe UI', sans-serif;
     background-color: #fafafa;
-    /* Light soft background */
 }
 
 .form-container {
@@ -18,6 +17,7 @@ mat-card {
     border-radius: 14px;
     margin-bottom: 30px;
     transition: box-shadow 0.3s ease, transform 0.3s ease;
+    word-break: break-word;
 }
 
 mat-card:hover {
@@ -29,10 +29,12 @@ mat-card-title {
     font-size: 22px;
     font-weight: 600;
     color: #1a1a1a;
+    word-break: break-word;
 }
 
 mat-card-content {
     padding: 24px;
+    word-break: break-word;
 }
 
 .full-width {
@@ -44,6 +46,7 @@ mat-card-actions {
     display: flex;
     justify-content: flex-end;
     padding: 16px 24px 24px;
+    flex-wrap: wrap;
 }
 
 h3 {
@@ -52,6 +55,7 @@ h3 {
     color: #111;
     font-weight: 600;
     margin-bottom: 16px;
+    word-break: break-word;
 }
 
 /* Area Cards Section */
@@ -59,7 +63,6 @@ h3 {
     display: flex;
     flex-direction: column;
     gap: 5px;
-    /* spacing between cards */
 }
 
 .area-card {
@@ -70,6 +73,7 @@ h3 {
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     transform: scale(1);
     cursor: pointer;
+    word-break: break-word;
 }
 
 .area-card:hover {
@@ -82,6 +86,8 @@ h3 {
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    flex-wrap: wrap;
+    gap: 12px;
 }
 
 .area-info {
@@ -92,30 +98,40 @@ h3 {
     color: #333;
     line-height: 1.6;
     letter-spacing: 0.25px;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 .area-info div {
     font-weight: 400;
-    /* Normal for value */
+    word-break: break-word;
+    overflow-wrap: break-word;
+    max-width: 100%;
 }
 
 .area-info div strong {
     font-weight: 550;
     font-size: 14px;
     color: #000;
-    /* Grey color for labels */
     margin-right: 4px;
 }
 
+/* 🛠 Updated: Center aligned edit/delete icons */
 .area-actions {
     display: flex;
     gap: 8px;
     align-items: center;
+    justify-content: center;
+    height: 100%;
+    flex-wrap: wrap;
 }
 
 button[mat-icon-button] {
     width: 36px;
     height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background-color: #f6f6f6;
     border-radius: 50%;
     transition: background-color 0.2s ease;
@@ -141,6 +157,7 @@ button[color="warn"] mat-icon {
     background: #ffffff;
     border-radius: 14px;
     box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.05);
+    word-break: break-word;
 }
 
 .edit-form {
@@ -153,6 +170,7 @@ button[color="warn"] mat-icon {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
+    flex-wrap: wrap;
 }
 
 hr {
@@ -162,7 +180,7 @@ hr {
     background: linear-gradient(to right, transparent, #ddd, transparent);
 }
 
-
+/* 📱 Responsive */
 @media (max-width: 600px) {
     .area-view {
         flex-direction: column;
@@ -173,6 +191,7 @@ hr {
     .area-actions {
         align-self: flex-end;
         margin-top: 12px;
+        justify-content: flex-start;
     }
 
     .edit-buttons {
