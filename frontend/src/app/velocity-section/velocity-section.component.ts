@@ -157,37 +157,57 @@ export class VelocitySectionComponent implements OnInit {
     });
   }
 
-  saveVelocity() {
-    if (this.velocityForm.invalid) {
-      this.velocityForm.markAllAsTouched();
-      this.openDialog('Validation Error', 'Please complete all Velocity fields.');
-      return;
-    }
-
-    const velocityPayload = this.velocityForm.value;
-
-    if (this.editingVelocityId) {
-      this.velocityService.updateVelocity(this.editingVelocityId, velocityPayload).subscribe({
-        next: () => {
-          this.snackBar.open('Velocity updated successfully!', 'Close', { duration: 3000 });
-          this.velocityForm.reset();
-          this.editingVelocityId = null;
-          this.loadVelocities();
-        },
-        error: () => this.openDialog('Error', 'Failed to update Velocity.')
-      });
-    } else {
-      const { scrumAreaId, ...payload } = velocityPayload;
-      this.velocityService.addVelocity(scrumAreaId, payload).subscribe({
-        next: () => {
-          this.snackBar.open('Velocity added successfully!', 'Close', { duration: 3000 });
-          this.velocityForm.reset();
-          this.loadVelocities();
-        },
-        error: () => this.openDialog('Error', 'Failed to add Velocity.')
-      });
-    }
+saveVelocity() {
+  if (this.velocityForm.invalid) {
+    this.velocityForm.markAllAsTouched();
+    this.openDialog('Validation Error', 'Please complete all Velocity fields.');
+    return;
   }
+
+  const velocityPayload = this.velocityForm.value;
+  const fullScrumArea = this.scrumAreas.find(area => area.id === velocityPayload.scrumAreaId);
+
+  if (!fullScrumArea) {
+    this.openDialog('Error', 'Scrum Area is required.');
+    return;
+  }
+
+  const finalPayload = {
+    ...velocityPayload,
+    scrumArea: fullScrumArea
+  };
+  delete finalPayload.scrumAreaId; // Clean up: remove the temporary form field
+
+  if (this.editingVelocityId) {
+    // Update Velocity
+    this.velocityService.updateVelocity(this.editingVelocityId, finalPayload).subscribe({
+      next: () => {
+        this.snackBar.open('Velocity updated successfully!', 'Close', { duration: 3000 });
+        this.velocityForm.reset();
+        this.editingVelocityId = null;
+        this.loadVelocities();
+      },
+      error: (err) => {
+        const msg = err?.error?.message?.[0]?.split(':')[1]?.trim() || 'Failed to update Velocity.';
+        this.openDialog('Error', msg);
+      }
+    });
+  } else {
+    // Add Velocity
+    this.velocityService.addVelocity(fullScrumArea.id, finalPayload).subscribe({
+      next: () => {
+        this.snackBar.open('Velocity added successfully!', 'Close', { duration: 3000 });
+        this.velocityForm.reset();
+        this.loadVelocities();
+      },
+      error: (err) => {
+        const msg = err?.error?.message?.[0]?.split(':')[1]?.trim() || 'Failed to add Velocity.';
+        this.openDialog('Error', msg);
+      }
+    });
+  }
+}
+
 
   editVelocity(v: any) {
     this.velocityForm.patchValue({

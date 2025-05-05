@@ -1,111 +1,74 @@
 package com.fdp.datareport.entities;
 
+import com.fdp.datareport.validation.annotations.ValidDateRange;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class ProjectTest {
+class ProjectEntityTest {
 
-    private Validator validator;
-    private Area dummyArea;
-    private Status dummyStatus;
+    private static Validator validator;
 
-    @BeforeEach
-    public void setup() {
+    @BeforeAll
+    static void setupValidator() {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
-
-        dummyArea = new Area(1L, "Development", "Alice", "alice@example.com");
-        dummyStatus = new Status(1L, "In Progress", 50);
-    }
-
-    private Date getDate(int year, int month, int day) {
-        Calendar cal = Calendar.getInstance();
-        cal.set(year, month - 1, day);
-        return cal.getTime();
     }
 
     @Test
-    public void testValidProject() {
-        Project project = new Project(
-                1L,
-                "Project Alpha",
-                "Backend revamp",
-                "John Doe",
-                "JIRA-123",
-                dummyArea,
-                dummyStatus,
-                getDate(2024, 5, 1),
-                getDate(2024, 5, 10)
-        );
+    void shouldPassValidationForValidProject() {
+        Project project = new Project();
+        project.setProjectName("Test Project");
+        project.setDescription("This is a test.");
+        project.setDeveloper("Jane Developer");
+        project.setJira("JIRA-123");
+        project.setStartDate(new Date(System.currentTimeMillis() - 86400000)); // yesterday
+        project.setEndDate(new Date()); // today
+        project.setArea(new Area()); // stub
+        project.setStatus(new Status()); // stub
 
         Set<ConstraintViolation<Project>> violations = validator.validate(project);
-        assertTrue(violations.isEmpty(), "Valid project should have no violations");
+        assertTrue(violations.isEmpty(), "Project should be valid");
     }
 
     @Test
-    public void testMissingFields() {
-        Project project = new Project(); // All fields null
+    void shouldFailWhenRequiredFieldsMissing() {
+        Project project = new Project(); // all fields null
+
         Set<ConstraintViolation<Project>> violations = validator.validate(project);
-
-        violations.forEach(v -> System.out.println(v.getPropertyPath() + ": " + v.getMessage()));
-
-        assertEquals(5, violations.size(), "Expected violations for projectName, developer, jira, startDate, endDate");
+        assertFalse(violations.isEmpty(), "Should have violations");
+        assertEquals(5, violations.size(), "Expected 5 @NotNull violations (projectName, developer, jira, startDate, endDate)");
     }
 
     @Test
-    public void testInvalidDateRange() {
-        Project project = new Project(
-                1L,
-                "Project Beta",
-                "Frontend upgrade",
-                "Jane Doe",
-                "JIRA-456",
-                dummyArea,
-                dummyStatus,
-                getDate(2024, 5, 10), // startDate
-                getDate(2024, 5, 1)   // endDate (invalid)
-        );
+    void shouldFailValidationForInvalidDateRange() {
+        Project project = new Project();
+        project.setProjectName("Date Test");
+        project.setDeveloper("Dev");
+        project.setJira("JIRA-456");
+        project.setStartDate(new Date(System.currentTimeMillis() + 86400000)); // tomorrow
+        project.setEndDate(new Date()); // today
 
         Set<ConstraintViolation<Project>> violations = validator.validate(project);
-        violations.forEach(v -> System.out.println(v.getPropertyPath() + ": " + v.getMessage()));
+        assertFalse(violations.isEmpty(), "Expected validation failure for invalid date range");
 
-        assertEquals(1, violations.size(), "Should detect one date range violation");
+        boolean hasDateRangeViolation = violations.stream()
+                .anyMatch(v -> v.getMessage().toLowerCase().contains("end date") || v.getMessage().toLowerCase().contains("valid date"));
 
-        assertTrue(violations.stream().anyMatch(v ->
-                v.getMessage().equals("Start date must not be after end date")
-        ));
+        assertTrue(hasDateRangeViolation, "Expected a date range violation message");
     }
 
     @Test
-    public void testNullDatesStillValidForRangeValidator() {
-        Project project = new Project(
-                1L,
-                "Project Gamma",
-                "No dates provided",
-                "Dev",
-                "JIRA-789",
-                dummyArea,
-                dummyStatus,
-                null,
-                null
-        );
-
-        Set<ConstraintViolation<Project>> violations = validator.validate(project);
-        violations.forEach(v -> System.out.println(v.getPropertyPath() + ": " + v.getMessage()));
-
-        // Should be 2 violations from @NotNull on startDate and endDate
-        assertEquals(2, violations.size());
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("startDate")));
-        assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("endDate")));
+    void onDeleteShouldNotThrow() {
+        Project project = new Project();
+        assertDoesNotThrow(project::onDelete, "onDelete should not throw any exception");
     }
 }

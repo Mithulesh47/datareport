@@ -50,7 +50,7 @@ public class Project {
 
         // This method is invoked before a Project is deleted
     @PreRemove
-    private void onDelete() {
+    void onDelete() {
         // The cascading behavior for Area and Status is already handled by annotations
         // No need to do manual nullification here for cascading delete or nullification
     }
